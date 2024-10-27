@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Call Campaign Management System</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            height: 100vh;
+            background-color: #f4f6f8;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: #001529;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            padding-top: 20px;
+        }
+
+        .sidebar .menu-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        .sidebar .menu-item:hover, .sidebar .menu-item.active {
+            background-color: #1890ff;
+        }
+
+        .sidebar .menu-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header h2 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        .add-button {
+            background-color: #1890ff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .add-button:hover {
+            background-color: #40a9ff;
+        }
+
+        /* Search and Filters */
+        .search-filter {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            margin-right: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filters select, .filters input[type="date"] {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            min-width: 150px;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        th {
+            background-color: #fafafa;
+            color: #333;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Action Buttons */
+        .action-buttons button {
+            margin-right: 5px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #fff;
+        }
+
+        .detail-button {
+            background-color: #52c41a;
+        }
+
+        .edit-button {
+            background-color: #faad14;
+        }
+
+        .delete-button {
+            background-color: #f5222d;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            background-color: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .pagination button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .pagination .current-page {
+            font-weight: bold;
+        }
+
+        /* Modal Styles */
+        .modal-header {
+            background-color: #1890ff;
+            color: #fff;
+        }
+
+        .modal-title {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .modal-footer .btn {
+            min-width: 80px;
+        }
+
+        /* Tabs */
+        .nav-tabs .nav-link.active {
+            background-color: #1890ff;
+            color: #fff;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+
+            .sidebar .menu-item span {
+                display: none;
+            }
+
+            .header h2 {
+                font-size: 20px;
+            }
+
+            .add-button {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 8px 10px;
+            }
+
+            .action-buttons button {
+                padding: 4px 8px;
+                font-size: 10px;
+            }
+
+            .filters select, .filters input[type="date"] {
+                min-width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="menu-item">
+            <i class="fas fa-users"></i><span>Membership</span>
+        </div>
+        <div class="menu-item">
+            <i class="fas fa-envelope"></i><span>Service Mail</span>
+        </div>
+        <div class="menu-item">
+            <i class="fas fa-ticket-alt"></i><span>Coupons</span>
+        </div>
+        <div class="menu-item active">
+            <i class="fas fa-phone"></i><span>Service Call</span>
+        </div>
+        <div class="menu-item">
+            <i class="fas fa-chart-line"></i><span>Report</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <h2>Service Call</h2>
+            <button class="add-button" data-bs-toggle="modal" data-bs-target="#addCampaignModal">
+                <i class="fas fa-plus"></i> Add New Campaign
+            </button>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="search-filter">
+            <div class="search-box">
+                <input type="text" id="searchCampaign" placeholder="Search Campaign Name">
+            </div>
+            <div class="filters">
+                <select id="filterStatus">
+                    <option value="">Status</option>
+                    <option value="Hoàn thành">Hoàn thành</option>
+                    <option value="Chưa bắt đầu">Chưa bắt đầu</option>
+                    <option value="Đang chạy">Đang chạy</option>
+                </select>
+                <select id="filterPIC">
+                    <option value="">PIC</option>
+                    <option value="Nguyễn Văn A">Nguyễn Văn A</option>
+                    <option value="Nguyễn Văn B">Nguyễn Văn B</option>
+                    <option value="Trần Thị C">Trần Thị C</option>
+                </select>
+                <input type="date" id="filterFromDate">
+                <input type="date" id="filterToDate">
+                <button class="btn btn-primary" id="applyFilters">Filter</button>
+                <button class="btn btn-secondary" id="resetFilters">Reset</button>
+            </div>
+        </div>
+
+        <!-- Campaign List Table -->
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Campaign Name</th>
+                    <th>Campaign From/To</th>
+                    <th>PIC</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="campaignTableBody">
+                <!-- Sample Row -->
+                <tr>
+                    <td>1</td>
+                    <td>Chiến dịch Mùa Xuân</td>
+                    <td>01/04/2024 - 30/04/2024</td>
+                    <td>Nguyễn Văn A</td>
+                    <td>Đang chạy</td>
+                    <td class="action-buttons">
+                        <button class="btn detail-button" data-bs-toggle="modal" data-bs-target="#detailModal"><i class="fas fa-info-circle"></i> Detail</button>
+                        <button class="btn edit-button"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="btn delete-button"><i class="fas fa-trash-alt"></i> Delete</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Chiến dịch Giáng Sinh</td>
+                    <td>15/12/2024 - 31/12/2024</td>
+                    <td>Trần Thị C</td>
+                    <td>Chưa bắt đầu</td>
+                    <td class="action-buttons">
+                        <button class="btn detail-button" data-bs-toggle="modal" data-bs-target="#detailModal"><i class="fas fa-info-circle"></i> Detail</button>
+                        <button class="btn edit-button"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="btn delete-button"><i class="fas fa-trash-alt"></i> Delete</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Chiến dịch Hè Này</td>
+                    <td>01/07/2024 - 31/08/2024</td>
+                    <td>Nguyễn Văn B</td>
+                    <td>Hoàn thành</td>
+                    <td class="action-buttons">
+                        <button class="btn detail-button" data-bs-toggle="modal" data-bs-target="#detailModal"><i class="fas fa-info-circle"></i> Detail</button>
+                        <button class="btn edit-button"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="btn delete-button"><i class="fas fa-trash-alt"></i> Delete</button>
+                    </td>
+                </tr>
+                <!-- Add more rows as needed -->
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            <button class="btn btn-light" id="prevPage">Previous</button>
+            <span class="current-page">1</span>
+            <button class="btn btn-light" id="nextPage">Next</button>
+        </div>
+    </div>
+
+    <!-- Add Campaign Modal -->
+    <div class="modal fade" id="addCampaignModal" tabindex="-1" aria-labelledby="addCampaignModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addCampaignModalLabel">Add New Campaign</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="addCampaignForm">
+                <div class="mb-3">
+                    <label for="campaignName" class="form-label">Campaign Name</label>
+                    <input type="text" class="form-control" id="campaignName" required>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="campaignFrom" class="form-label">Campaign From</label>
+                        <input type="date" class="form-control" id="campaignFrom" required>
+                    </div>
+                    <div class="col">
+                        <label for="campaignTo" class="form-label">Campaign To</label>
+                        <input type="date" class="form-control" id="campaignTo" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="campaignPIC" class="form-label">PIC</label>
+                    <select class="form-select" id="campaignPIC" required>
+                        <option value="">Select PIC</option>
+                        <option value="Nguyễn Văn A">Nguyễn Văn A</option>
+                        <option value="Nguyễn Văn B">Nguyễn Văn B</option>
+                        <option value="Trần Thị C">Trần Thị C</option>
+                    </select>
+                </div>
+                <hr>
+                <h5>Membership List</h5>
+                <!-- Bỏ button "Add Customer" ở đây -->
+                <!-- <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addCustomerModal"><i class="fas fa-user-plus"></i> Add Customer</button> -->
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Customer Name</th>
+                            <th>Phone</th>
+                            <th>Level</th>
+                            <th>Join Date</th>
+                            <th>Birthday Month</th>
+                            <th>Date to Date</th>
+                            <th>Website Name</th>
+                            <th>Order From/To</th>
+                            <th>PIC</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="membershipList">
+                        <!-- Sample Data -->
+                        <tr>
+                            <td>Nguyễn Thị D</td>
+                            <td>0123456789</td>
+                            <td>Gold</td>
+                            <td>15/02/2023</td>
+                            <td>03</td>
+                            <td>01/04/2024 - 30/04/2024</td>
+                            <td>hince</td>
+                            <td>1 - 5</td>
+                            <td>Nguyễn Văn A</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm assign-button"><i class="fas fa-check"></i> Assign</button>
+                                <button class="btn btn-danger btn-sm delete-button"><i class="fas fa-trash-alt"></i> Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Trần Văn E</td>
+                            <td>0987654321</td>
+                            <td>Silver</td>
+                            <td>20/07/2022</td>
+                            <td>07</td>
+                            <td>15/07/2024 - 15/08/2024</td>
+                            <td>mixsoon</td>
+                            <td>6 - 10</td>
+                            <td>Trần Thị C</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm assign-button"><i class="fas fa-check"></i> Assign</button>
+                                <button class="btn btn-danger btn-sm delete-button"><i class="fas fa-trash-alt"></i> Delete</button>
+                            </td>
+                        </tr>
+                        <!-- Thêm nhiều dòng dữ liệu mẫu nếu cần -->
+                    </tbody>
+                </table>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" id="saveCampaign">Save</button>
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addCustomerModal"><i class="fas fa-user-plus"></i> Add Customer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Customer Modal -->
+    <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addCustomerModalLabel">Add Customer</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <!-- Tabs -->
+            <ul class="nav nav-tabs" id="customerTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="join-tab" data-bs-toggle="tab" data-bs-target="#join" type="button" role="tab" aria-controls="join" aria-selected="true">Date Join Member</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="birth-tab" data-bs-toggle="tab" data-bs-target="#birth" type="button" role="tab" aria-controls="birth" aria-selected="false">Date of Birth</button>
+              </li>
+            </ul>
+            <div class="tab-content" id="customerTabsContent">
+              <!-- Date Join Member Tab -->
+              <div class="tab-pane fade show active" id="join" role="tabpanel" aria-labelledby="join-tab">
+                <div class="mt-3">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label for="joinDate" class="form-label">Date Join Member</label>
+                            <input type="date" class="form-control" id="joinDate">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="joinPlatform" class="form-label">Platform Website</label>
+                            <select class="form-select" id="joinPlatform">
+                                <option value="">All</option>
+                                <option value="hince">hince</option>
+                                <option value="BBIA">BBIA</option>
+                                <option value="mixsoon">mixsoon</option>
+                                <option value="sky007">sky007</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="joinOrderPoint" class="form-label">Order Point</label>
+                            <input type="number" class="form-control" id="joinOrderPoint" min="0">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="joinLevelUp" class="form-label">Level Up Condition</label>
+                            <input type="month" class="form-control" id="joinLevelUp">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="joinLevelDown" class="form-label">Member Downgrade Month</label>
+                            <input type="month" class="form-control" id="joinLevelDown">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <div class="search-box">
+                            <input type="text" id="searchJoinCustomer" class="form-control" placeholder="Search Customer Name">
+                        </div>
+                        <div>
+                            <button class="btn btn-primary" id="filterJoin">Filter</button>
+                            <button class="btn btn-secondary" id="resetJoin">Reset</button>
+                        </div>
+                    </div>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Customer Name</th>
+                                <th>Phone Number</th>
+                                <th>Date Join Member</th>
+                                <th>Order Point</th>
+                                <th>Platform Website</th>
+                                <th>Level Up Condition</th>
+                                <th>Member Downgrade Month</th>
+                            </tr>
+                        </thead>
+                        <tbody id="joinCustomerList">
+                            <!-- Filtered customers will be displayed here -->
+                            <tr>
+                                <td>Nguyễn Thị D</td>
+                                <td>0123456789</td>
+                                <td>15/02/2023</td>
+                                <td>5</td>
+                                <td>hince</td>
+                                <td>05/2023</td>
+                                <td>11/2023</td>
+                            </tr>
+                            <tr>
+                                <td>Phạm Văn F</td>
+                                <td>0345678901</td>
+                                <td>10/05/2023</td>
+                                <td>8</td>
+                                <td>BBIA</td>
+                                <td>09/2023</td>
+                                <td>03/2024</td>
+                            </tr>
+                            <!-- Add more sample customers as needed -->
+                        </tbody>
+                    </table>
+                </div>
+              </div>
+              <!-- Date of Birth Tab -->
+              <div class="tab-pane fade" id="birth" role="tabpanel" aria-labelledby="birth-tab">
+                <div class="mt-3">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label for="birthDate" class="form-label">Date of Birth</label>
+                            <input type="date" class="form-control" id="birthDate">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="birthPlatform" class="form-label">Platform Website</label>
+                            <select class="form-select" id="birthPlatform">
+                                <option value="">All</option>
+                                <option value="hince">hince</option>
+                                <option value="BBIA">BBIA</option>
+                                <option value="mixsoon">mixsoon</option>
+                                <option value="sky007">sky007</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="birthOrderPoint" class="form-label">Order Point</label>
+                            <input type="number" class="form-control" id="birthOrderPoint" min="0">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="birthLevelUp" class="form-label">Level Up Condition</label>
+                            <input type="month" class="form-control" id="birthLevelUp">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="birthLevelDown" class="form-label">Member Downgrade Month</label>
+                            <input type="month" class="form-control" id="birthLevelDown">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <div class="search-box">
+                            <input type="text" id="searchBirthCustomer" class="form-control" placeholder="Search Customer Name">
+                        </div>
+                        <div>
+                            <button class="btn btn-primary" id="filterBirth">Filter</button>
+                            <button class="btn btn-secondary" id="resetBirth">Reset</button>
+                        </div>
+                    </div>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Customer Name</th>
+                                <th>Phone Number</th>
+                                <th>Date of Birth</th>
+                                <th>Order Point</th>
+                                <th>Platform Website</th>
+                                <th>Level Up Condition</th>
+                                <th>Member Downgrade Month</th>
+                            </tr>
+                        </thead>
+                        <tbody id="birthCustomerList">
+                            <!-- Filtered customers will be displayed here -->
+                            <tr>
+                                <td>Trần Văn E</td>
+                                <td>0987654321</td>
+                                <td>20/07/1990</td>
+                                <td>10</td>
+                                <td>mixsoon</td>
+                                <td>08/2023</td>
+                                <td>02/2024</td>
+                            </tr>
+                            <tr>
+                                <td>Lê Thị G</td>
+                                <td>0567890123</td>
+                                <td>05/11/1985</td>
+                                <td>12</td>
+                                <td>sky007</td>
+                                <td>10/2023</td>
+                                <td>04/2024</td>
+                            </tr>
+                            <!-- Add more sample customers as needed -->
+                        </tbody>
+                    </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="assignCustomers">Assign to CS</button>
+            <button type="button" class="btn btn-success" id="confirmCustomers" data-bs-dismiss="modal"><i class="fas fa-check-circle"></i> Confirm</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detail Modal (Placeholder) -->
+    <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="detailModalLabel">Campaign Detail</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <!-- Details will be populated here -->
+            <p>Thông tin chi tiết của chiến dịch sẽ được hiển thị tại đây.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies (Popper.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // JavaScript for Interactivity
+
+        // Handle Add Customer Modal Assign to CS Button
+        document.getElementById('assignCustomers').addEventListener('click', function() {
+            // Logic to assign selected customers to the campaign
+            // For demo purposes, we'll close the modal
+            var addCustomerModal = new bootstrap.Modal(document.getElementById('addCustomerModal'));
+            addCustomerModal.hide();
+            alert('Customers assigned to CS successfully!');
+        });
+
+        // Handle Confirm Customers Button
+        document.getElementById('confirmCustomers').addEventListener('click', function() {
+            // Logic to confirm selected customers
+            // For demo purposes, we'll display an alert
+            alert('Customers confirmed successfully!');
+        });
+
+        // Handle Save Campaign Button
+        document.getElementById('saveCampaign').addEventListener('click', function() {
+            // Logic to save the new campaign
+            // For demo purposes, we'll add a new row to the campaign table
+            var campaignName = document.getElementById('campaignName').value;
+            var campaignFrom = document.getElementById('campaignFrom').value;
+            var campaignTo = document.getElementById('campaignTo').value;
+            var campaignPIC = document.getElementById('campaignPIC').value;
+            var status = 'Đang chạy'; // Default status
+
+            if(campaignName && campaignFrom && campaignTo && campaignPIC) {
+                var tableBody = document.getElementById('campaignTableBody');
+                var newRow = document.createElement('tr');
+                var rowCount = tableBody.rows.length + 1;
+                newRow.innerHTML = `
+                    <td>${rowCount}</td>
+                    <td>${campaignName}</td>
+                    <td>${formatDate(campaignFrom)} - ${formatDate(campaignTo)}</td>
+                    <td>${campaignPIC}</td>
+                    <td>${status}</td>
+                    <td class="action-buttons">
+                        <button class="btn detail-button" data-bs-toggle="modal" data-bs-target="#detailModal"><i class="fas fa-info-circle"></i> Detail</button>
+                        <button class="btn edit-button"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="btn delete-button"><i class="fas fa-trash-alt"></i> Delete</button>
+                    </td>
+                `;
+                tableBody.appendChild(newRow);
+                // Close the modal
+                var addCampaignModal = bootstrap.Modal.getInstance(document.getElementById('addCampaignModal'));
+                addCampaignModal.hide();
+                // Reset the form
+                document.getElementById('addCampaignForm').reset();
+                alert('Campaign added successfully!');
+                // Update pagination
+                paginateTable();
+            } else {
+                alert('Please fill in all required fields.');
+            }
+        });
+
+        // Function to format date from YYYY-MM-DD to DD/MM/YYYY
+        function formatDate(dateStr) {
+            var parts = dateStr.split('-');
+            return parts[2] + '/' + parts[1] + '/' + parts[0];
+        }
+
+        // Handle Delete Campaign
+        document.getElementById('campaignTableBody').addEventListener('click', function(e) {
+            if(e.target.classList.contains('delete-button') || e.target.parentElement.classList.contains('delete-button')) {
+                if(confirm('Are you sure you want to delete this campaign?')) {
+                    var row = e.target.closest('tr');
+                    row.remove();
+                    alert('Campaign deleted successfully!');
+                    // Update pagination
+                    paginateTable();
+                }
+            }
+        });
+
+        // Pagination Logic (Simple Example)
+        let currentPage = 1;
+        const rowsPerPage = 5;
+
+        function paginateTable() {
+            const tableBody = document.getElementById('campaignTableBody');
+            const rows = tableBody.getElementsByTagName('tr');
+            const totalRows = rows.length;
+            const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+            // Hide all rows
+            for(let i = 0; i < totalRows; i++) {
+                rows[i].style.display = 'none';
+            }
+
+            // Show current page rows
+            for(let i = (currentPage - 1) * rowsPerPage; i < currentPage * rowsPerPage && i < totalRows; i++) {
+                rows[i].style.display = '';
+            }
+
+            // Update pagination display
+            document.querySelector('.current-page').textContent = currentPage;
+        }
+
+        document.getElementById('prevPage').addEventListener('click', function() {
+            if(currentPage > 1) {
+                currentPage--;
+                paginateTable();
+            }
+        });
+
+        document.getElementById('nextPage').addEventListener('click', function() {
+            const tableBody = document.getElementById('campaignTableBody');
+            const rows = tableBody.getElementsByTagName('tr');
+            const totalRows = rows.length;
+            const totalPages = Math.ceil(totalRows / rowsPerPage);
+            if(currentPage < totalPages) {
+                currentPage++;
+                paginateTable();
+            }
+        });
+
+        // Initial Pagination Setup
+        paginateTable();
+
+        // Search and Filter Functionality
+        document.getElementById('applyFilters').addEventListener('click', function() {
+            const searchValue = document.getElementById('searchCampaign').value.toLowerCase();
+            const statusFilter = document.getElementById('filterStatus').value;
+            const picFilter = document.getElementById('filterPIC').value;
+            const fromDate = document.getElementById('filterFromDate').value;
+            const toDate = document.getElementById('filterToDate').value;
+
+            const tableBody = document.getElementById('campaignTableBody');
+            const rows = tableBody.getElementsByTagName('tr');
+
+            for(let i = 0; i < rows.length; i++) {
+                const campaignName = rows[i].getElementsByTagName('td')[1].textContent.toLowerCase();
+                const campaignDate = rows[i].getElementsByTagName('td')[2].textContent;
+                const campaignPIC = rows[i].getElementsByTagName('td')[3].textContent;
+                const campaignStatus = rows[i].getElementsByTagName('td')[4].textContent;
+
+                let show = true;
+
+                if(searchValue && !campaignName.includes(searchValue)) {
+                    show = false;
+                }
+
+                if(statusFilter && campaignStatus !== statusFilter) {
+                    show = false;
+                }
+
+                if(picFilter && campaignPIC !== picFilter) {
+                    show = false;
+                }
+
+                if(fromDate || toDate) {
+                    const [from, to] = campaignDate.split(' - ');
+                    const campaignFrom = new Date(from.split('/').reverse().join('-'));
+                    const campaignTo = new Date(to.split('/').reverse().join('-'));
+                    if(fromDate && campaignFrom < new Date(fromDate)) {
+                        show = false;
+                    }
+                    if(toDate && campaignTo > new Date(toDate)) {
+                        show = false;
+                    }
+                }
+
+                rows[i].style.display = show ? '' : 'none';
+            }
+
+            // Reset to first page after filtering
+            currentPage = 1;
+            paginateTable();
+        });
+
+        document.getElementById('resetFilters').addEventListener('click', function() {
+            document.getElementById('searchCampaign').value = '';
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterPIC').value = '';
+            document.getElementById('filterFromDate').value = '';
+            document.getElementById('filterToDate').value = '';
+            const tableBody = document.getElementById('campaignTableBody');
+            const rows = tableBody.getElementsByTagName('tr');
+            for(let i = 0; i < rows.length; i++) {
+                rows[i].style.display = '';
+            }
+            currentPage = 1;
+            paginateTable();
+        });
+
+        // Filter Customers in Add Customer Modal
+        document.getElementById('filterJoin').addEventListener('click', function() {
+            const joinDate = document.getElementById('joinDate').value;
+            const joinPlatform = document.getElementById('joinPlatform').value;
+            const joinOrderPoint = document.getElementById('joinOrderPoint').value;
+            const joinLevelUp = document.getElementById('joinLevelUp').value;
+            const joinLevelDown = document.getElementById('joinLevelDown').value;
+            const searchJoin = document.getElementById('searchJoinCustomer').value.toLowerCase();
+
+            const tableBody = document.getElementById('joinCustomerList');
+            const rows = tableBody.getElementsByTagName('tr');
+
+            for(let i = 0; i < rows.length; i++) {
+                const name = rows[i].getElementsByTagName('td')[0].textContent.toLowerCase();
+                const phone = rows[i].getElementsByTagName('td')[1].textContent;
+                const dateJoin = rows[i].getElementsByTagName('td')[2].textContent;
+                const orderPoint = rows[i].getElementsByTagName('td')[3].textContent;
+                const platform = rows[i].getElementsByTagName('td')[4].textContent;
+                const levelUp = rows[i].getElementsByTagName('td')[5].textContent;
+                const levelDown = rows[i].getElementsByTagName('td')[6].textContent;
+
+                let show = true;
+
+                if(searchJoin && !name.includes(searchJoin)) {
+                    show = false;
+                }
+
+                if(joinDate) {
+                    const campaignDate = new Date(joinDate);
+                    const customerDate = new Date(dateJoin.split('/').reverse().join('-'));
+                    if(customerDate < campaignDate) {
+                        show = false;
+                    }
+                }
+
+                if(joinPlatform && platform !== joinPlatform) {
+                    show = false;
+                }
+
+                if(joinOrderPoint && parseInt(orderPoint) < parseInt(joinOrderPoint)) {
+                    show = false;
+                }
+
+                if(joinLevelUp && levelUp !== joinLevelUp) {
+                    show = false;
+                }
+
+                if(joinLevelDown && levelDown !== joinLevelDown) {
+                    show = false;
+                }
+
+                rows[i].style.display = show ? '' : 'none';
+            }
+        });
+
+        document.getElementById('resetJoin').addEventListener('click', function() {
+            document.getElementById('joinDate').value = '';
+            document.getElementById('joinPlatform').value = '';
+            document.getElementById('joinOrderPoint').value = '';
+            document.getElementById('joinLevelUp').value = '';
+            document.getElementById('joinLevelDown').value = '';
+            document.getElementById('searchJoinCustomer').value = '';
+            const tableBody = document.getElementById('joinCustomerList');
+            const rows = tableBody.getElementsByTagName('tr');
+            for(let i = 0; i < rows.length; i++) {
+                rows[i].style.display = '';
+            }
+        });
+
+        document.getElementById('filterBirth').addEventListener('click', function() {
+            const birthDate = document.getElementById('birthDate').value;
+            const birthPlatform = document.getElementById('birthPlatform').value;
+            const birthOrderPoint = document.getElementById('birthOrderPoint').value;
+            const birthLevelUp = document.getElementById('birthLevelUp').value;
+            const birthLevelDown = document.getElementById('birthLevelDown').value;
+            const searchBirth = document.getElementById('searchBirthCustomer').value.toLowerCase();
+
+            const tableBody = document.getElementById('birthCustomerList');
+            const rows = tableBody.getElementsByTagName('tr');
+
+            for(let i = 0; i < rows.length; i++) {
+                const name = rows[i].getElementsByTagName('td')[0].textContent.toLowerCase();
+                const phone = rows[i].getElementsByTagName('td')[1].textContent;
+                const dob = rows[i].getElementsByTagName('td')[2].textContent;
+                const orderPoint = rows[i].getElementsByTagName('td')[3].textContent;
+                const platform = rows[i].getElementsByTagName('td')[4].textContent;
+                const levelUp = rows[i].getElementsByTagName('td')[5].textContent;
+                const levelDown = rows[i].getElementsByTagName('td')[6].textContent;
+
+                let show = true;
+
+                if(searchBirth && !name.includes(searchBirth)) {
+                    show = false;
+                }
+
+                if(birthDate) {
+                    const campaignDate = new Date(birthDate);
+                    const customerDOB = new Date(dob.split('/').reverse().join('-'));
+                    if(customerDOB > campaignDate) {
+                        show = false;
+                    }
+                }
+
+                if(birthPlatform && platform !== birthPlatform) {
+                    show = false;
+                }
+
+                if(birthOrderPoint && parseInt(orderPoint) < parseInt(birthOrderPoint)) {
+                    show = false;
+                }
+
+                if(birthLevelUp && levelUp !== birthLevelUp) {
+                    show = false;
+                }
+
+                if(birthLevelDown && levelDown !== birthLevelDown) {
+                    show = false;
+                }
+
+                rows[i].style.display = show ? '' : 'none';
+            }
+        });
+
+        document.getElementById('resetBirth').addEventListener('click', function() {
+            document.getElementById('birthDate').value = '';
+            document.getElementById('birthPlatform').value = '';
+            document.getElementById('birthOrderPoint').value = '';
+            document.getElementById('birthLevelUp').value = '';
+            document.getElementById('birthLevelDown').value = '';
+            document.getElementById('searchBirthCustomer').value = '';
+            const tableBody = document.getElementById('birthCustomerList');
+            const rows = tableBody.getElementsByTagName('tr');
+            for(let i = 0; i < rows.length; i++) {
+                rows[i].style.display = '';
+            }
+        });
+
+        // Add Customer to Membership List
+        document.getElementById('assignCustomers').addEventListener('click', function() {
+            // For demo purposes, we'll add all visible customers from each tab
+            const joinRows = document.querySelectorAll('#joinCustomerList tr');
+            const birthRows = document.querySelectorAll('#birthCustomerList tr');
+            const membershipList = document.getElementById('membershipList');
+
+            joinRows.forEach(row => {
+                if(row.style.display !== 'none') {
+                    const cells = row.getElementsByTagName('td');
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `
+                        <td>${cells[0].textContent}</td>
+                        <td>${cells[1].textContent}</td>
+                        <td>${cells[2].textContent}</td>
+                        <td>${cells[3].textContent}</td>
+                        <td>${cells[6].textContent || ''}</td>
+                        <td>${cells[2].textContent}</td>
+                        <td>${cells[4].textContent}</td>
+                        <td>${cells[3].textContent} - ${cells[4].textContent}</td>
+                        <td>${cells[7] ? cells[7].textContent : 'Nguyễn Văn A'}</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm assign-button"><i class="fas fa-check"></i> Assign</button>
+                            <button class="btn btn-danger btn-sm delete-button"><i class="fas fa-trash-alt"></i> Delete</button>
+                        </td>
+                    `;
+                    membershipList.appendChild(newRow);
+                }
+            });
+
+            birthRows.forEach(row => {
+                if(row.style.display !== 'none') {
+                    const cells = row.getElementsByTagName('td');
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `
+                        <td>${cells[0].textContent}</td>
+                        <td>${cells[1].textContent}</td>
+                        <td>${cells[2].textContent}</td>
+                        <td>${cells[3].textContent}</td>
+                        <td>${cells[6].textContent || ''}</td>
+                        <td>${cells[2].textContent}</td>
+                        <td>${cells[4].textContent}</td>
+                        <td>${cells[3].textContent} - ${cells[4].textContent}</td>
+                        <td>${cells[7] ? cells[7].textContent : 'Nguyễn Văn A'}</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm assign-button"><i class="fas fa-check"></i> Assign</button>
+                            <button class="btn btn-danger btn-sm delete-button"><i class="fas fa-trash-alt"></i> Delete</button>
+                        </td>
+                    `;
+                    membershipList.appendChild(newRow);
+                }
+            });
+
+            // Close the Add Customer Modal
+            var addCustomerModal = bootstrap.Modal.getInstance(document.getElementById('addCustomerModal'));
+            addCustomerModal.hide();
+            alert('Customers assigned to the campaign!');
+        });
+
+        // Handle Delete Member in Membership List
+        document.getElementById('membershipList').addEventListener('click', function(e) {
+            if(e.target.classList.contains('delete-button') || e.target.parentElement.classList.contains('delete-button')) {
+                if(confirm('Are you sure you want to remove this customer from the campaign?')) {
+                    var row = e.target.closest('tr');
+                    row.remove();
+                    alert('Customer removed successfully!');
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>
